@@ -23,8 +23,8 @@ void MainWindow::tabletPressEvent(QTabletEvent *te){
     switch(te->deviceType()) {
         case QInputDevice::DeviceType::Stylus:
          {
-            multiplierX = te->xTilt() * te->pressure();
-            multiplierY = te->yTilt() * te -> pressure();
+        multiplierX = te->xTilt() * te->pressure() * (1 - te->tangentialPressure()) * 255;
+            multiplierY = te->yTilt() * te -> pressure() * (1 - te->tangentialPressure()) * 255;
             drawing = true;
             lastPoint = te->position().toPoint();
 
