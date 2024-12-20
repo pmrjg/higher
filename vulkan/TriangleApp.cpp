@@ -7,6 +7,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
+#include <cstring>
+#include <optional>
 
 
 void TriangleApp::run() {
@@ -22,8 +24,6 @@ void TriangleApp::initWindow() {
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
 }
-
-
 
 void TriangleApp::initVulkan() {
     createInstance();
@@ -47,6 +47,10 @@ void TriangleApp::createInstance() {
     createInfo.enabledExtensionCount = glfwExtensionCount;
     createInfo.ppEnabledExtensionNames = glfwExtensions;
 
+    if (enableValidationLayers) {
+        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+        createInfo.ppEnabledLayerNames = validationLayers.data();
+    }
     createInfo.enabledLayerCount = 0;
 
     VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
@@ -58,6 +62,10 @@ void TriangleApp::createInstance() {
     std::cout<< "available extensions:" << std::endl;
     for (const auto& extension : extensions) {
         std::cout << '\t' << extension.extensionName << '\n';
+    }
+
+    if (enableValidationLayers && !checkValidationLayerSupport()) {
+        throw std::runtime_error("validation layers requested, but not available!");
     }
 
 
@@ -75,5 +83,73 @@ void TriangleApp::cleanup() {
     glfwDestroyWindow(window);
     glfwTerminate();
 }
+
+bool TriangleApp::checkValidationLayerSupport() {
+    uint32_t layerCount;
+    vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+    std::vector<VkLayerProperties> availableLayers(layerCount);
+    vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+    for (const auto& layerName: validationLayers) {
+        bool layerFound = false;
+
+        for (const auto& layerProperties: availableLayers) {
+            if (strcmp(layerName, layerProperties.layerName) == 0) {
+                layerFound = true;
+                break;
+            }
+        }
+
+        if (!layerFound) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void TriangleApp::pickPhysicalDevice() {
+    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+
+    if (deviceCount == 0) {
+        throw std::runtime_error("failed to find GPUs with Vulkan support");
+    }
+
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+    vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+
+    for (const auto& device : devices) {
+        if (isDeviceSuitable(device)) {
+            physicalDevice = device;
+            break;
+        }
+    }
+
+    if (physicalDevice == VK_NULL_HANDLE) {
+        throw std::runtime_error("failed to find a suitable GPU!");
+    }
+}
+
+bool TriangleApp::isDeviceSuitable(VkPhysicalDevice device) {
+    VkPhysicalDeviceProperties deviceProperties;
+    VkPhysicalDeviceFeatures deviceFeatures;
+    vkGetPhysicalDeviceProperties(device, &deviceProperties);
+    vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+    return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU && deviceFeatures.geometryShader;
+
+}
+
+QueueFamilyIndices TriangleApp::findQueueFamilies(VkPhysicalDevice device) {
+    QueueFamilyIndices indices;
+
+
+    return indices;
+}
+
+
 
 
