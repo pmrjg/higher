@@ -19,7 +19,9 @@ private:
     void mainLoop();
     void cleanup();
     void initWindow();
+    void createInstance();
     GLFWwindow* window;
+    VkInstance instance;
 };
 
 #endif //TRIANGLE_H
