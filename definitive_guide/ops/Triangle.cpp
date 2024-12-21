@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <vector>
 #include <GLFW/glfw3.h>
+#include <cstring>
 
 void Triangle::run() {
     initWindow();
@@ -62,11 +63,14 @@ void Triangle::createInstance() {
     if (result != VK_SUCCESS) {
         throw std::runtime_error("failed to create instance");
     }
+
+    glfwMakeContextCurrent(window);
 }
 
 
 void Triangle::mainLoop() {
     while (!glfwWindowShouldClose(window)) {
+        glfwSwapBuffers(window);
         glfwPollEvents();
     }
 }
@@ -75,5 +79,15 @@ void Triangle::cleanup() {
     vkDestroyInstance(instance, nullptr);
     glfwDestroyWindow(window);
     glfwTerminate();
+}
+
+bool Triangle::checkValidationLayerSupport() {
+  uint32_t layerCount;
+  vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
+
+  std::vector<VkLayerProperties> availableLayers(layerCount);
+  vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+
+  return false;
 }
 
