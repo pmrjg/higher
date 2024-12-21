@@ -1,6 +1,6 @@
 # Created by https://www.toptal.com/developers/gitignore/api/c++,cmake,jetbrains+all,qtcreator,qt,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=c++,cmake,jetbrains+all,qtcreator,qt,visualstudiocode
-
+addons/
 ### C++ ###
 # Prerequisites
 *.d
