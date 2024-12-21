@@ -9,6 +9,7 @@
 #include <vector>
 #include <GLFW/glfw3.h>
 #include <cstring>
+#include <map>
 
 void Triangle::run() {
     initWindow();
@@ -27,16 +28,7 @@ void Triangle::initWindow() {
 void Triangle::initVulkan() {
     createInstance();
     setupDebugMessenger();
-    uint32_t extensionCount = 0;
-
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr);
-    std::vector<VkExtensionProperties> extensions(extensionCount);
-    vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
-
-    std::cout << "available extensions: " << std::endl;
-    for (const auto& extension : extensions) {
-        std::cout << '\t' << extension.extensionName << std::endl;
-    }
+    pickPhysicalDevice();
 }
 
 void Triangle::setupDebugMessenger() {
@@ -185,5 +177,62 @@ void Triangle::DestroyDebugUtilsMessagerEXT(VkInstance instance, VkDebugUtilsMes
         func(instance, debugMessenger, pAllocator);
     }
 }
+
+void Triangle::pickPhysicalDevice() {
+    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+    if (deviceCount == 0) {
+        throw std::runtime_error("failed to find GPUs with Vulkan support");
+    }
+
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+    vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+
+    std::multimap<int, VkPhysicalDevice> candidates;
+    for (const auto& device : devices) {
+        int score = rateDeviceSuitability(device);
+        candidates.insert(std::make_pair(score, device));
+    }
+
+    if (candidates.rbegin()->first > 0) {
+        physicalDevice = candidates.rbegin()->second;
+    } else {
+        throw std::runtime_error("failed to find a suitable GPU");
+    }
+
+    if (physicalDevice == VK_NULL_HANDLE) {
+        throw std::runtime_error("failed to find a suitable GPU!");
+    }
+}
+
+/*bool Triangle::isDeviceSuitable(VkPhysicalDevice device) {
+    VkPhysicalDeviceProperties deviceProperties;
+    VkPhysicalDeviceFeatures deviceFeatures;
+
+    vkGetPhysicalDeviceProperties(device, &deviceProperties);
+    vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+    return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && deviceFeatures.geometryShader;
+}*/
+
+int Triangle::rateDeviceSuitability(VkPhysicalDevice device) {
+    int score = 0;
+
+    VkPhysicalDeviceProperties deviceProperties;
+    VkPhysicalDeviceFeatures deviceFeatures;
+    vkGetPhysicalDeviceProperties(device, &deviceProperties);
+    vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+    if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {score += 1000;}
+
+    score += static_cast<int>(deviceProperties.limits.maxImageDimension2D);
+
+    if (!deviceFeatures.geometryShader) { return 0;}
+
+    return score;
+}
+
+
 
 

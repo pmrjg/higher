@@ -31,9 +31,12 @@ private:
     void cleanup();
     void initWindow();
     void createInstance();
+    void pickPhysicalDevice();
+    //bool isDeviceSuitable();
     GLFWwindow* window;
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
+    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
     bool checkValidationLayerSupport();
     std::vector<const char*> getRequiredExtensions();
     void setupDebugMessenger();
@@ -46,6 +49,7 @@ private:
         const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
         void *pUserData
     );
+    static int rateDeviceSuitability(VkPhysicalDevice device);
 };
 
 #endif //TRIANGLE_H
