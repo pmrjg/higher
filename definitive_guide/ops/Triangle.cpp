@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <vector>
 #include <GLFW/glfw3.h>
+#include <SDL3/SDL.h>
 
 void Triangle::run() {
     initWindow();
@@ -17,10 +18,21 @@ void Triangle::run() {
 }
 
 void Triangle::initWindow() {
-    glfwInit();
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-    window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
+    SDL_PropertiesID props;
+
+    SDL_Init(SDL_INIT_VIDEO);
+
+    SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_WAYLAND_CREATE_EGL_WINDOW_BOOLEAN, true);
+    SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_VULKAN_BOOLEAN, true);
+    SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, WIDTH);
+    SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, HEIGHT);
+
+    window = SDL_CreateWindowWithProperties(props);
+
+
+    if (window == nullptr) {
+        throw std::runtime_error("Failed to create window");
+    }
 }
 
 void Triangle::initVulkan() {
@@ -66,14 +78,21 @@ void Triangle::createInstance() {
 
 
 void Triangle::mainLoop() {
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
+    SDL_Event event;
+    while (true) {
+        SDL_PollEvent(&event);
+
+        switch (event.type) {
+            case SDL_EVENT_QUIT:
+                return;
+            default: {}
+        }
     }
 }
 
 void Triangle::cleanup() {
     vkDestroyInstance(instance, nullptr);
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 }
 

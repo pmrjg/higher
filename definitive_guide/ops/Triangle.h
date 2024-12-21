@@ -5,8 +5,8 @@
 #ifndef TRIANGLE_H
 #define TRIANGLE_H
 
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
+#include <SDL3/SDL_video.h>
+#include <vulkan/vulkan.h>
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -20,7 +20,7 @@ private:
     void cleanup();
     void initWindow();
     void createInstance();
-    GLFWwindow* window;
+    SDL_Window *window;
     VkInstance instance;
 };
 
