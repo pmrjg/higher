@@ -61,8 +61,6 @@ void Triangle::createInstance() {
     createInfo.enabledExtensionCount = glfwExtensionCount;
     createInfo.ppEnabledExtensionNames = glfwExtensions;
 
-    VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
-
     if (enableValidationLayers) {
         createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
         createInfo.ppEnabledLayerNames = validationLayers.data();
@@ -71,6 +69,7 @@ void Triangle::createInstance() {
         createInfo.enabledLayerCount = 0;
     }
 
+    VkResult result = vkCreateInstance(&createInfo, nullptr, &instance);
 
     if (result != VK_SUCCESS) {
         throw std::runtime_error("failed to create instance");
