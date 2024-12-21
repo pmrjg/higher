@@ -12,14 +12,14 @@
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
 
-const std::vector<const char*> validationLayers = {
+const std::vector validationLayers = {
     "VK_LAYER_KHRONOS_validation"
 };
 
 #ifdef NDEBUG
-    const bool enableValidationLayers = true;
-#else
     const bool enableValidationLayers = false;
+#else
+    const bool enableValidationLayers = true;
 #endif
 
 class Triangle {
