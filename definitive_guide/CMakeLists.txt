@@ -10,8 +10,8 @@ find_package(SDL3 REQUIRED)
 
 
 add_executable(definitive_guide main.cpp
-        ops/Triangle.cpp
-        ops/Triangle.h)
+        src/Triangle.cpp
+        include/Triangle.h)
 
 find_library(GLFW glfw)
 find_library(DL dl)
