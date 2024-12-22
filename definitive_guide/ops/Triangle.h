@@ -9,6 +9,8 @@
 #include <vector>
 #include <GLFW/glfw3.h>
 
+#include "QueueFamilyIndices.h"
+
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
 
@@ -32,11 +34,14 @@ private:
     void initWindow();
     void createInstance();
     void pickPhysicalDevice();
+    void createLogicalDevice();
     //bool isDeviceSuitable();
     GLFWwindow* window;
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+    VkDevice device;
+    VkQueue graphicsQueue;
     bool checkValidationLayerSupport();
     std::vector<const char*> getRequiredExtensions();
     void setupDebugMessenger();
@@ -50,6 +55,8 @@ private:
         void *pUserData
     );
     static int rateDeviceSuitability(VkPhysicalDevice device);
+    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+    bool isDeviceSuitable(VkPhysicalDevice device);
 };
 
 #endif //TRIANGLE_H

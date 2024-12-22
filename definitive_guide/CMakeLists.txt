@@ -11,7 +11,8 @@ find_package(glfw3 REQUIRED)
 
 add_executable(definitive_guide main.cpp
         ops/Triangle.cpp
-        ops/Triangle.h)
+        ops/Triangle.h
+        ops/QueueFamilyIndices.h)
 
 find_library(GLFW glfw)
 find_library(DL libdl)
